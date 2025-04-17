@@ -27,3 +27,11 @@ output "rds_db_name" {
   description = "RDS database name"
   value       = aws_db_instance.corporateproject_mysql.db_name
 }
+output "cloudformation_stack_id" {
+  value = aws_cloudformation_stack.corporate_stack.id
+}
+
+/*output "cloudformation_stack_status" {
+  value = aws_cloudformation_stack.corporate_stack.stack_status
+}*/
+
