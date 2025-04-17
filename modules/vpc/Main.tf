@@ -46,7 +46,7 @@ resource "aws_security_group" "my-sg" {
 # STEP2: CREATE EC2 USING PEM & SG
 resource "aws_instance" "my-ec2" {
   ami           = "ami-00bb6a80f01f03502"  
-  instance_type = "t2.medium"
+  instance_type = "t2.large"
   key_name      = "Devops project"    
   vpc_security_group_ids = [aws_security_group.my-sg.id]
   
@@ -159,8 +159,8 @@ resource "aws_eks_node_group" "CorporateProject" {
   subnet_ids      = aws_subnet.CorporateProject_subnet[*].id
 
   scaling_config {
-    desired_size = 3
-    max_size     = 3
+    desired_size = 5
+    max_size     = 7
     min_size     = 3
   }
 
@@ -310,6 +310,31 @@ resource "aws_dynamodb_table" "terraform_locks" {
     Name        = "Terraform State Lock Table"
   }
 }
+
+resource "aws_iam_role_policy_attachment" "CorporateProject_s3_policy" {
+  role       = aws_iam_role.CorporateProject_node_group_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+}
+
+resource "aws_cloudformation_stack" "corporate_stack" {
+  name         = "CorporateProjectStack"
+  template_url = "https://s3.ap-south-1.amazonaws.com/sb3bucket33/cloudformation-template.yaml"
+  capabilities  = ["CAPABILITY_NAMED_IAM"]
+
+   /*parameters = {
+    Environment = "dev"
+    KeyName     = "Devops project"
+    DBUsername  = "admin"
+    DBPassword  = "StrongPassword123!"
+  }*/
+
+
+  tags = {
+    Project = "Corporate DevOps"
+    Owner   = "Suresh"
+  }
+}
+
 resource "aws_iam_role_policy_attachment" "CorporateProject_node_group_role_policy" {
   role       = aws_iam_role.CorporateProject_node_group_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
